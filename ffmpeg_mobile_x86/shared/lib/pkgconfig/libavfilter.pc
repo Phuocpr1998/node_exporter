@@ -1,0 +1,14 @@
+prefix=/home/lap13588/DataFolder/utils_libs/ijkplayer/android/contrib/build/ffmpeg-x86/output/shared
+exec_prefix=${prefix}
+libdir=/home/lap13588/DataFolder/utils_libs/ijkplayer/android/contrib/build/ffmpeg-x86/output/shared/lib
+includedir=/home/lap13588/DataFolder/utils_libs/ijkplayer/android/contrib/build/ffmpeg-x86/output/shared/include
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 7.40.101
+Requires: libavutil >= 56.22.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lijkffmpeg -pthread -lm
+Libs.private: 
+Cflags: -I${includedir}

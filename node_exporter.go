@@ -11,26 +11,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package node_exporter
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/user"
 	"sort"
+	"time"
 
 	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/promlog/flag"
 
+	"github.com/Phuocpr1998/node_exporter/collector"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
-	"github.com/prometheus/node_exporter/collector"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -137,7 +139,11 @@ func (h *handler) innerHandler(filters ...string) (http.Handler, error) {
 	return handler, nil
 }
 
-func main() {
+var (
+	server *http.Server
+)
+
+func Start() {
 	var (
 		listenAddress = kingpin.Flag(
 			"web.listen-address",
@@ -182,20 +188,18 @@ func main() {
 	}
 
 	http.Handle(*metricsPath, newHandler(!*disableExporterMetrics, *maxRequests, logger))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html>
-			<head><title>Node Exporter</title></head>
-			<body>
-			<h1>Node Exporter</h1>
-			<p><a href="` + *metricsPath + `">Metrics</a></p>
-			</body>
-			</html>`))
-	})
 
 	level.Info(logger).Log("msg", "Listening on", "address", *listenAddress)
-	server := &http.Server{Addr: *listenAddress}
-	if err := web.ListenAndServe(server, *configFile, logger); err != nil {
-		level.Error(logger).Log("err", err)
-		os.Exit(1)
-	}
+	server = &http.Server{Addr: *listenAddress}
+	go func() {
+		if err := web.ListenAndServe(server, *configFile, logger); err != nil {
+			level.Error(logger).Log("err", err)
+			os.Exit(1)
+		}
+	}()
+}
+
+func Stop() {
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	_ = server.Shutdown(ctx)
 }

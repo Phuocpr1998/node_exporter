@@ -140,3 +140,24 @@ promtool: $(PROMTOOL)
 $(PROMTOOL):
 	mkdir -p $(FIRST_GOPATH)/bin
 	curl -fsS -L $(PROMTOOL_URL) | tar -xvzf - -C $(FIRST_GOPATH)/bin --no-anchored --strip 1 promtool
+
+default: build
+PKG_CONFIG := $(shell pwd)
+
+clean :
+	rm -fr dist
+init:
+	go mod tidy
+	mkdir dist -p
+build:
+	make clean
+	make init
+	PKG_CONFIG_PATH="${PKG_CONFIG}/ffmpeg_mobile_arm/lib/pkgconfig" CGO_CFLAGS="-I${PKG_CONFIG}/ffmpeg_mobile_arm/include" CGO_LDFLAGS="-L${PKG_CONFIG}/ffmpeg_mobile_arm/lib/" gomobile bind -v -o dist/node_exporter.aar -target=android/arm .
+build_arm64:
+	make clean
+	make init
+	PKG_CONFIG_PATH=${PKG_CONFIG}/ffmpeg_mobile_arm64/lib/pkgconfig CGO_CFLAGS="-I${PKG_CONFIG}/ffmpeg_mobile_arm64/include" CGO_LDFLAGS="-L${PKG_CONFIG}/ffmpeg_mobile_arm64/lib/" gomobile bind -v -o dist/node_exporter.aar -target=android/arm64 .
+build_x86:
+	make clean
+	make init
+	PKG_CONFIG_PATH=${PKG_CONFIG}/ffmpeg_mobile_x86/lib/pkgconfig CGO_CFLAGS="-I${PKG_CONFIG}/ffmpeg_mobile_x86/include" CGO_LDFLAGS="-L${PKG_CONFIG}/ffmpeg_mobile_x86/lib/" gomobile bind -v -o dist/node_exporter.aar -target=android/386 .

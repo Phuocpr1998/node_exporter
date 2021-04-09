@@ -1,4 +1,4 @@
-module github.com/prometheus/node_exporter
+module github.com/Phuocpr1998/node_exporter
 
 require (
 	github.com/beevik/ntp v0.3.0
@@ -19,6 +19,7 @@ require (
 	github.com/prometheus/procfs v0.6.0
 	github.com/siebenmann/go-kstat v0.0.0-20200303194639-4e8294f9e9d5
 	github.com/soundcloud/go-runit v0.0.0-20150630195641-06ad41a06c4a
+	golang.org/x/mobile v0.0.0-20210220033013-bdb1ca9a1e08 // indirect
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
